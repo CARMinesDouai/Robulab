@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- Luc Fabresse, april 2015 -->
+<launch>
+  <arg name="robot_name" default="kompai2"/> <!-- kompai1 -->
+  <arg name="pharos_display" default="headless"/> <!-- pharos -->
+  <arg name="show_rviz" default="false"/>
+  <arg name="driver" default="robulabdriver"/>
+
+  <node pkg="$(arg driver)" type="pharos" name="MyNODEkompai" args="pureroskompai_publish_pose_and_scan_for_$(arg robot_name)"/>
+
+</launch>
+
+

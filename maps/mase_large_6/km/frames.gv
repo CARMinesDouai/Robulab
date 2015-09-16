@@ -1,0 +1,9 @@
+digraph G {
+"base_link" -> "laser"[label="Broadcaster: /player\nAverage rate: 49.914 Hz\nMost recent transform: 1435840423.498 ( 68574.456 sec old)\nBuffer length: 4.928 sec\n"];
+"odom" -> "base_link"[label="Broadcaster: /player\nAverage rate: 60.208 Hz\nMost recent transform: 1435840423.480 ( 68574.474 sec old)\nBuffer length: 4.933 sec\n"];
+"map" -> "odom"[label="Broadcaster: /slam_karto\nAverage rate: 20.204 Hz\nMost recent transform: 1435908997.952 ( 0.002 sec old)\nBuffer length: 4.900 sec\n"];
+edge [style=invis];
+ subgraph cluster_legend { style=bold; color=black; label ="view_frames Result";
+"Recorded at time: 1435908997.954"[ shape=plaintext ] ;
+ }->"map";
+}

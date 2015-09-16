@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- Luc Fabresse, april 2015 -->
+
+<launch>
+ 
+  <node pkg="robulabdriver" type="headless" name="MyNODE" output="screen" args="pharosexamplepackage_topic_publishing_example"/>
+
+</launch>
+
+

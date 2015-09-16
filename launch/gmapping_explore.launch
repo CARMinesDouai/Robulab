@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+
+<launch>
+
+   <arg name="sensor_range" default="2.0"/>
+  <arg name="use_sim_time" default="false" />
+  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+  <arg name="show_rviz" default="true" />
+
+  <arg name="map_size" default="202"/>
+
+  <arg name="bringup_robulab" default="true"/>
+  <include file="$(find robulab)/launch/bringup.launch" if="$(arg bringup_robulab)"/>  
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robulab_gmapping)/rviz_cfg/gmapping-movebase.rviz" if="$(arg show_rviz)"/>
+ 
+  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen"> 
+    <param name="maxUrange" value="29.0"/>
+    <param name="particles" value="30"/>
+    
+    <param name="srr" value="0.1"/>
+    <param name="srt" value="0.2"/>
+    <param name="str" value="0.1"/>
+    <param name="stt" value="0.2"/>
+    
+    <param name="xmin" value="-15.0"/>
+    
+    <param name="xmax" value="15.0"/>
+    <param name="ymin" value="-15.0"/>
+    <param name="ymax" value="15.0"/>
+    <param name="delta" value="0.05"/>
+
+    <param name="temporalUpdate" value="0.2"/>
+    
+    
+  </node> 
+  
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+    <param name="controller_frequency" value="20"/>
+    <remap from="base_scan" to="scan"/>
+    <remap from="cmd_vel" to="command_velocity"/>
+    <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load" ns="global_costmap"/> 
+    <rosparam file="$(find robulab)/yaml/global_costmap.yaml" command="load" /> 
+    <rosparam file="$(find robulab)/yaml/navfn.yaml" command="load"/> 
+
+    <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load" ns="local_costmap"/> 
+    <rosparam file="$(find robulab)/yaml/local_costmap.yaml" command="load" />
+    <rosparam file="$(find robulab)/yaml/trajectory_planner_robulab.yaml" command="load"/> 
+  </node>
+
+   <node pkg="frontier_exploration" type="explore_client" name="explore_client" output="screen">
+   </node>
+
+   <node pkg="frontier_exploration" type="explore_server" name="explore_server" output="screen" >
+
+        <param name="frequency" type="double" value="2.0"/>
+        <param name="goal_aliasing" type="double" value="$(arg sensor_range)"/>
+        <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load"/> 
+        #All standard costmap_2d parameters as in move_base, other than BoundedExploreLayer
+        <rosparam ns="explore_costmap" subst_value="true">           
+            transform_tolerance: 0.5
+            update_frequency: 5.0
+            publish_frequency: 5.0
+
+            #must match incoming static map
+            global_frame: /map
+            robot_base_frame: base_link
+            resolution: 0.05
+
+            rolling_window: false
+            track_unknown_space: true
+
+            plugins: 
+
+                - {name: static,           type: "costmap_2d::StaticLayer"}            
+                - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
+                #Can disable sensor layer if gmapping is fast enough to update scans
+                #- {name: sensor,           type: "costmap_2d::ObstacleLayer"}
+                - {name: inflation,        type: "costmap_2d::InflationLayer"}
+
+            static:
+                #Can pull data from gmapping, map_server or a non-rolling costmap            
+                map_topic: /map
+                #map_topic: /move_base/global_costmap/costmap 
+                subscribe_to_updates: true
+
+            explore_boundary:
+                resize_to_boundary: false
+                frontier_travel_point: centroid
+                #set to false for gmapping, true if re-exploring a known area
+                explore_clear_space: false
+
+            sensor:
+                observation_sources: laser
+                laser: {data_type: LaserScan, clearing: true, marking: true, topic: scan, inf_is_valid: true, raytrace_range: $(arg sensor_range), obstacle_range: $(arg sensor_range)}
+            
+            inflation:
+                inflation_radius: 0.35
+                cost_scaling_factor: 10.0
+                robot_radius: 0.35
+            
+      </rosparam>
+
+        
+
+
+    </node>
+
+    
+
+</launch>
+  
+  

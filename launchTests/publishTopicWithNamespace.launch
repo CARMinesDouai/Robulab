@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- Luc Fabresse, april 2015 -->
+<launch>
+
+  <group ns="superns">
+    <include file="$(find robulab)/launchTests/publishTopic.launch" />
+  </group>
+
+</launch>
+
+

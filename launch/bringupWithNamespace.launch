@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!-- Luc Fabresse, april 2015
+
+How to use parameters from command line:
+
+	roslaunch robulab bringupWithNamespace.launch robot_name:=kompai2 show_rviz:=true
+-->
+
+<launch>
+
+  <arg name="robot_name" default="kompai2"/> <!-- kompai1 -->
+  <arg name="namespace"  default="$(arg robot_name)"/>
+ 
+  <group ns="$(arg namespace)">
+    <param name="tf_prefix" value="$(arg namespace)"/>
+    <include file="$(find robulab)/launch/bringup.launch">
+	<arg name="rviz_config" value="$(find robulab)/rviz_cfg/$(arg robot_name).rviz" />
+    </include>
+  </group>
+
+</launch>
+
+

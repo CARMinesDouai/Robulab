@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- Luc Fabresse, may 2015
+
+How to use parameters from command line:
+
+	roslaunch robulab bringup.launch robot_name:=kompai2 show_rviz:=true
+-->
+
+<launch>
+  <arg name="robot_name" default="kompai1"/> <!-- kompai2 -->
+  <arg name="driver_package" default="robulabdriver"/>
+
+  <arg name="with_odom" default="true"/>
+
+  <arg name="show_rviz" default="false"/>
+  <arg name="rviz_config" default="$(find robulab)/rviz_cfg/bringup.rviz"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0.15 0 0.25 0 0 0 base_link laser 10"/>
+
+  <node pkg="$(arg driver_package)" type="headless" name="$(arg robot_name)_driver" args="pureroskompai_publish_pose_and_scan_for_$(arg robot_name)"/>
+
+  <node pkg="$(arg driver_package)" type="headless" name="$(arg robot_name)_odom" args="purerosrobulab_publish_odom_for_$(arg robot_name)" if="$(arg with_odom)"/>
+  
+  <node pkg="$(arg driver_package)" type="headless" name="$(arg robot_name)_tf_odom" args="purerosrobulab_publish_odom_to_base_link_tf_for_$(arg robot_name)" if="$(arg with_odom)"/>
+
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(arg rviz_config)" if="$(arg show_rviz)"/>
+</launch>
+
+

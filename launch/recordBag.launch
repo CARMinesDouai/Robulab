@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<launch>
+  <arg name="robot_name" default="kompai2"/>
+
+  <include file="$(find robulab)/launch/bringup.launch">
+  	<arg name="show_rviz" value="true" />
+  </include>
+ 
+  <node pkg="rosbag" type="record" name="rosbag_robulab_pose_scan_odom_tf"
+       args="record -o $(find robulab)/rosbags/robulab_bag pose scan odom /tf" />
+ 
+</launch>

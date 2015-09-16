@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<launch> 
+  <param name="/use_sim_time" value="true"/>
+
+  <node pkg="rosbag" type="play" name="bagplayer" args="--clock $(find robulab)/rosbags/nav350robulab_DIA_slow.bag" /> <!-- -r 3 -delay 3 -->
+  <!--node pkg="rosbag" type="play" name="bagplayer" args="- -clock $(find robulab)/rosbags/maze_like/maze_like_40x40_8.bag" /-->
+
+
+</launch>
+  
+  

@@ -1,0 +1,28 @@
+#!/bin/bash 
+
+# some magic to find out the real location of this script dealing with symlinks
+DIR=`readlink "$0"` || DIR="$0";
+DIR=`dirname "$DIR"`;
+cd "$DIR"
+DIR=`pwd`
+cd - > /dev/null 
+
+echo $DIR
+
+# Constants =======
+CATKIN_SRCDIR="${DIR}/../../"
+
+# create driver package ====
+
+DRIVER_PACKAGENAME="robulabdriver"
+
+pharos create ${DRIVER_PACKAGENAME}
+
+DRIVER_DIR="$CATKIN_SRCDIR/$DRIVER_PACKAGENAME"
+
+DRIVER_IMAGE="$DRIVER_DIR/image/$DRIVER_PACKAGENAME.image"
+PHARO_VM="$DRIVER_DIR/vm/pharo --nodisplay"
+
+# load ST code for the driver
+${PHARO_VM} ${DRIVER_IMAGE} eval --save "Author fullName: 'robulabdriver'. (Gofer it url: 'http://smalltalkhub.com/mc/CAR/Robulab/main'; package: 'ConfigurationOfPureROS') load. #ConfigurationOfPureROS asClass load: 'robulab'."
+
