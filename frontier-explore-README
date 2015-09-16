@@ -1,0 +1,83 @@
+Requierements:
+
+- robulab driver is running
+- gmapping is running
+
+Move-base
+=========
+
+- remap: base_scan -> scan
+         cmd_vel -> command_velocity
+- controller_frequency: calculating the trajectory more often might be good for smoother path
+
+Then you must configure both local costmap and global costmap.
+To do so, load parameters from yaml files in namespaces local_costmap and global_costmap
+
+So far, 
+global costmap requires
+  costmap_common_robulab.yaml
+  global_costmap.yaml
+
+local costmap requires
+  costmap_common_robulab.yaml
+  local_costmap.yaml
+  trajectory_planner_robulab.yaml
+
+You can tweak inflation parameter in costmap_common_robulab.yaml:
+
+  inflation_radius
+  cost_scaling_factor
+  robot_radius
+
+To understand what they are all about I recommend http://wiki.ros.org/costmap_2d section 6.
+
+local_costmap.yaml and global_costmap.yaml defines very basic stuff like map size and resolution... very static things.
+
+trajectory_planner_robulab.yaml defines how the robot choose its paths. This might be interressing to try to put better parameters to get a smoother course planning.
+
+Frontier-Exploration
+====================
+
+"explore_client" is a node from frontier-exploration that let you define exploration boundaries from Rviz.
+
+"explore_server" is the main explore node.
+
+Explore_server
+==============
+
+parameters
+  - frequency: 2hz is good... no need of recalculating frontier very fast as you need to travel to them anyway.
+  - goal_aliasing: not really explicit... looks like the maximum range for the laser.
+
+followings parameters are in the explore_costmap namespace:
+  - transform_tolerance: Don't know...
+  - update_frequency: speed at which the costmap is gonna be recalculated
+  - publish_frequency: speed at the cost map will be published
+  - global_frame: must be frame of the map that you use as static map. We only have 1 static map... So it must be /map
+  - robot_base_frame: the frame of the robot (base_link)
+  - resolution: resolution of the costmap
+  - rolling_window: very obscur parameter... but as it is mostly a static map... I guess this should remains false.
+  - track_unknown_space: I don't know.
+
+Then comes plugins
+  - {name: static,           type: "costmap_2d::StaticLayer"}
+     This one allows you to load static map as reference for the exploration. You can load either /map or /global_costmap...       
+  - {name: explore_boundary, type: "frontier_exploration::BoundedExploreLayer"}
+     This one enable the service that the client use to send a goal to the exploration...
+  - {name: sensor,           type: "costmap_2d::ObstacleLayer"}
+     This one allows to add  the scan to the current costmap... It is not really usefull as the scan is already computed in the static map you import.
+  - {name: inflation,        type: "costmap_2d::InflationLayer"}
+     Inflate obstacles... same as move_base.
+
+Notes
+=====
+
+The messy part is really the inflation stuff.
+
+1/If the cost of a pixel on the map is 128, the robot will stop or simply avoid this area.
+2/If the cost of a point is between 128 and 1, it means the robot is close to an pass  obstacle but can still pass being extra careful
+3/If the cost of a point is 0... well its freespace.
+
+But the exploration node considers 2/ as a blocking point... It is very anoying... 
+
+
