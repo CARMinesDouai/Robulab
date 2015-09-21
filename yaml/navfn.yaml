@@ -1,2 +1,2 @@
-#NavfnROS:
-#  transform_tolerance: 0.3
+BaseGlobalPlanner:
+  visualize_potential: true

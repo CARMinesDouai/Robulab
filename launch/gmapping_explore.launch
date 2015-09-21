@@ -3,45 +3,30 @@
 <launch>
 
    <arg name="sensor_range" default="2.0"/>
-  <arg name="use_sim_time" default="false" />
-  <param name="/use_sim_time" value="$(arg use_sim_time)"/>
-  <arg name="show_rviz" default="true" />
+   <arg name="use_sim_time" default="false" />
+   <param name="/use_sim_time" value="$(arg use_sim_time)"/>
+   <arg name="show_rviz" default="true" />
 
   <arg name="map_size" default="202"/>
 
   <arg name="bringup_robulab" default="true"/>
   <include file="$(find robulab)/launch/bringup.launch" if="$(arg bringup_robulab)"/>  
-
-  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robulab_gmapping)/rviz_cfg/gmapping-movebase.rviz" if="$(arg show_rviz)"/>
- 
-  <node pkg="gmapping" type="slam_gmapping" name="slam_gmapping" output="screen"> 
-    <param name="maxUrange" value="29.0"/>
-    <param name="particles" value="30"/>
-    
-    <param name="srr" value="0.1"/>
-    <param name="srt" value="0.2"/>
-    <param name="str" value="0.1"/>
-    <param name="stt" value="0.2"/>
-    
-    <param name="xmin" value="-15.0"/>
-    
-    <param name="xmax" value="15.0"/>
-    <param name="ymin" value="-15.0"/>
-    <param name="ymax" value="15.0"/>
-    <param name="delta" value="0.05"/>
-
-    <param name="temporalUpdate" value="0.2"/>
-    
-    
-  </node> 
   
-  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+  <include file="$(find robulab)/launch/gmapping.launch">
+    <arg name="bringup_robulab" value="false"/>  
+    <arg name="show_rviz" value="false"/>  
+
+  </include>  
+  
+  <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robulab)/rviz_cfg/exploration.rviz" if="$(arg show_rviz)"/>
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" >
     <param name="controller_frequency" value="20"/>
+    <param name="planner_frequency" value="10"/>
     <remap from="base_scan" to="scan"/>
     <remap from="cmd_vel" to="command_velocity"/>
     <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load" ns="global_costmap"/> 
-    <rosparam file="$(find robulab)/yaml/global_costmap.yaml" command="load" /> 
-    <rosparam file="$(find robulab)/yaml/navfn.yaml" command="load"/> 
+    <rosparam file="$(find robulab)/yaml/global_costmap.yaml" command="load" />  
 
     <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load" ns="local_costmap"/> 
     <rosparam file="$(find robulab)/yaml/local_costmap.yaml" command="load" />
@@ -61,6 +46,7 @@
             transform_tolerance: 0.5
             update_frequency: 5.0
             publish_frequency: 5.0
+            robot_radius: 0.35
 
             #must match incoming static map
             global_frame: /map
