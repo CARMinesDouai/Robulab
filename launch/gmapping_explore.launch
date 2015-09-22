@@ -22,7 +22,8 @@
 
   <node pkg="move_base" type="move_base" respawn="false" name="move_base" >
     <param name="controller_frequency" value="20"/>
-    <param name="planner_frequency" value="10"/>
+    <param name="planner_frequency" value="20"/>
+    <param name="global_planner" value="BaseGlobalPlanner"/>
     <remap from="base_scan" to="scan"/>
     <remap from="cmd_vel" to="command_velocity"/>
     <rosparam file="$(find robulab)/yaml/costmap_common_robulab.yaml" command="load" ns="global_costmap"/> 
@@ -72,7 +73,7 @@
 
             explore_boundary:
                 resize_to_boundary: false
-                frontier_travel_point: centroid
+                frontier_travel_point: "middle"
                 #set to false for gmapping, true if re-exploring a known area
                 explore_clear_space: false
 
@@ -82,8 +83,7 @@
             
             inflation:
                 inflation_radius: 0.35
-                cost_scaling_factor: 10.0
-                robot_radius: 0.35
+                robot_radius: 0.32
             
       </rosparam>
 
