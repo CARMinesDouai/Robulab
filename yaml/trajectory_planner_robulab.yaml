@@ -1,9 +1,13 @@
 TrajectoryPlannerROS:
 #Robot Configuration Parameters
-  max_vel_x: 0.35
+  max_vel_x: 0.305
   holonomic_robot: false
 #Goal Tolerance Parameters
 #Forward Simulation Parameters
 #Trajectory Scoring Parameters
-  heading_lookahead: 0.23
+  pdist_scale: 1.5
+  occdist_scale: 0.02
   publish_cost_grid_pc: true
+  heading_lookahead: 0.3
+  vx_sample: 50
+  vtheta_samples: 100

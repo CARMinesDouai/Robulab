@@ -3,11 +3,11 @@
 <launch>
   <arg name="use_sim_time" default="false" />
   <param name="/use_sim_time" value="$(arg use_sim_time)"/>
-  <arg name="show_rviz" default="true" />
+  <arg name="show_rviz" default="false" />
 
   <arg name="map_size" default="202"/>
 
-  <arg name="bringup_robulab" default="true"/>
+  <arg name="bringup_robulab" default="false"/>
   <include file="$(find robulab)/launch/bringup.launch" if="$(arg bringup_robulab)"/>  
 
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robulab_gmapping)/rviz_cfg/gmapping.rviz" if="$(arg show_rviz)"/>
@@ -21,12 +21,11 @@
     <param name="str" value="0.1"/>
     <param name="stt" value="0.2"/>
     
-    <param name="xmin" value="-15.0"/>
-    
-    <param name="xmax" value="15.0"/>
-    <param name="ymin" value="-15.0"/>
-    <param name="ymax" value="15.0"/>
-    <param name="delta" value="0.05"/>
+    <param name="xmin" value="-1.0"/>
+    <param name="xmax" value="1.0"/>
+    <param name="ymin" value="-1.0"/>
+    <param name="ymax" value="1.0"/>
+    <param name="delta" value="0.025"/>
 
     <param name="temporalUpdate" value="0.2"/>
     <param name="map_update_interval" value="2.0"/>

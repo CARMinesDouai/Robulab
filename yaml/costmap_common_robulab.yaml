@@ -1,10 +1,7 @@
 map_type: costmap
 
 # Robot description parameters
-#inflation_radius: 0.90  
-#footprint: [[-0.3, -0.250], [-0.3, 0.250], [0.3, 0.250], [0.3, -0.250]]
-#circumscribed_radius: 0.4
-#inscribed_radius: 0.35
+  footprint: [[-0.27,-0.25], [-0.27, 0.25], [0.27,0.25], [0.27,-0.25]]
 
 # Map management parameters
 unknown_cost_value: 255
