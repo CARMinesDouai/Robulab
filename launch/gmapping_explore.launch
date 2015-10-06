@@ -18,6 +18,8 @@
 
   </include>  
   
+  <!--node pkg="pose_path_publisher" type="pose_path_publisher" name="pose_path_publisher" /-->
+
   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robulab)/rviz_cfg/exploration.rviz" if="$(arg show_rviz)"/>
 
   <node pkg="move_base" type="move_base" respawn="true" name="move_base" >
@@ -33,7 +35,30 @@
     <rosparam file="$(find robulab)/yaml/trajectory_planner_robulab.yaml" command="load"/>
 
   </node>
+  <node pkg="costmap_2d" type="costmap_2d_node" name="costmap_for_exploration">
+    <param name="global_frame" value="/map"/>
+    <rosparam ns="costmap" subst_value="true">
+      global_frame: /map
+      robot_base_frame: base_link
 
+      rolling_window: false
+      track_unknown_space: true
+
+      # Map management parameters
+      unknown_cost_value: 255
+      
+      robot_radius: 0.30
+      plugins: 
+        - {name: static, type: "costmap_2d::StaticLayer"}
+        - {name: inflation,        type: "costmap_2d::InflationLayer"}  
+      static:
+        #Can pull data from gmapping, map_server or a non-rolling costmap            
+        map_topic: /map
+        subscribe_to_updates: true 
+      inflation:
+        inflation_radius: 0.30
+    </rosparam>
+  </node>
    <node pkg="frontier_exploration" type="explore_client" name="explore_client" output="screen">
    </node>
 
@@ -48,7 +73,7 @@
             update_frequency: 20
             publish_frequency: 5.0
             robot_radius: 0.30
-
+            
             #must match incoming static map
             global_frame: /map
             robot_base_frame: base_link
@@ -75,7 +100,7 @@
 
             explore_boundary:
                 resize_to_boundary: false
-                frontier_travel_point: "middle"
+                frontier_travel_point: "centroid"
                 #set to false for gmapping, true if re-exploring a known area
                 explore_clear_space: false
 
@@ -84,8 +109,7 @@
                 laser: {data_type: LaserScan, clearing: true, marking: true, topic: scan, inf_is_valid: true, raytrace_range: $(arg sensor_range), obstacle_range: $(arg sensor_range)}
             
             inflation:
-                robot_radius: 0.50
-                inflation_radius: 0.50
+                inflation_radius: 0.30
                 
             
       </rosparam>
